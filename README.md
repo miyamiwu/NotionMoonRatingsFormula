@@ -1,4 +1,4 @@
-# Convert Numerical Book/Movie Ratings into an Emoji Rating Scale in Notion (and in Airtable)
+# Convert Number Properties into a Dynamic Moon Emojis Rating Scale with Decimal Support
 
 There are lots of tutorials about how to make your own dynamic emoji ratings, but I have found none that takes into consideration values with decimals like 3.5, 2.2, 4.75, etc. Thus, I came up with one myself.
 
