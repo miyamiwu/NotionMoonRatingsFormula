@@ -1,81 +1,197 @@
-# Convert Number Properties into a Dynamic Moon Emojis Rating Scale with Decimal Support
+# Notion Formula Tutorial: Convert Numbers with Decimals into Moon Phase Emojis
 
-There are lots of tutorials about how to make your own dynamic emoji ratings, but I have found none that takes into consideration values with decimals like 3.5, 2.2, 4.75, etc. Thus, I came up with one myself.
+There are many Notion formula tutorials that convert number ratings into cute emojis, but none seem to address ratings with decimals like 3.5, 2.2, or 4.75. To fill this gap, I wrote my own formula. This will be particularly useful for nuanced book and movie ratings.
 
-This emoji ratings formula is the first Notion formula I wrote, and although I admit it’s quite convoluted, it works anyway, so who cares. If you know how to do better, then feel free to modify it.
-
-We will be using a **rating scale of 1-5**, and values can have up to **two decimal places**. If it goes beyond two decimal places, the emojis won't show up properly. (The formula can be adjusted to accommodate more decimal places, but since this is only for book ratings, I will forego the hassle). And lastly, we will be using the different moon phases emojis: 🌑🌘🌗🌖🌕
+We will use a rating scale of 1-5, represented with different moon phase emojis: 🌑🌘🌗🌖🌕.
 
 ---
 
-## Tutorial
+## Preparing the Database
 
-### Preparing the Database
+You can utilize any database view, but for clarity in this tutorial, I recommend using the Table view.
 
-**Step 1.** In your database, create a number property and name it “Number Rating.” This number property is where you will input the numerical ratings. You may choose to hide this in your database view later if you want to show only the final moon ratings. [For this tutorial, I suggest you use the table view to make it easy to follow along.]
+### Step 1. Create a Number Property
 
-**Step 2.** Next, create a formula property. The name here doesn’t matter. In my setup, I call it Moon Ratings.
+Within your database, create a number property named “Number Rating.” This property will store your numerical ratings. You may choose to hide it later if you prefer displaying only the final moon ratings.
 
+### Step 2. Create a Formula Property.
 
-**Step 3.** Paste the entire **emojis-only.txt** formula into the formula property if you want to show only the emojis. Use **numbers-and-emojis.txt** if you want the rating value to show up beside the emojis.
+The name of this property is flexible. In my setup, I call it “Moon Ratings.” This is where we will write our formula.
 
-**Step 4.** Enter some numbers in the number property column and watch the emojis show up. And you’re done!
-
-If the number property is empty, then it will show an “N/A.”
-
----
-
-## How it Works
-
-The formula is divided into 7 stages.
-
-**Stage 1.** This part defines what happens if the number property has no value:
-
-    empty(prop("Number Rating")) ? "N/A" 
-
-You can change the “N/A” here to your own custom text.
-
-**Stage 2**. This part determines how many full moons 🌕 to return:
-
-    (slice("🌕🌕🌕🌕🌕", 0, floor(prop("Number Rating")) * 2)
-
-**Stage 3.** This stage intersects with stage 4. A lot of stuff happens in this part.
-
-First, it checks if the value contains a decimal by extracting the decimal numbers using `slice`. Second, it checks if it has 1 or 2 decimal places (which is important for the formula to be able to handle values having 2 decimal places). And lastly, it excludes values having no decimals from being implemented in Stage 4.
-
-    format(smaller(equal(length(slice(format(prop("Number Rating")), 2)), 1) ?
-
-**Stage 4.** Since stage 4 intersects with stage 3, you can see stage 3 still included below. Stage 4, particularly starting from the second `toNumber` statement, defines the conditions for a waning crescent moon emoji 🌘 to be returned.
-
-    format(smaller(equal(length(slice(format(prop("Number Rating")), 2)), 1) ? (toNumber(slice(format(prop("Number Rating")), 2)) * 10) : toNumber(slice(format(prop("Number Rating")), 2)), 40) ? "🌘" : "")
-
-The number 40 here tells us that values with a decimal of less than 0.4 should get the 🌘 emoji. If the value has no such decimal, then nothing will happen. The formula will then continue to the next stage.
-
-You can adjust the 40 here to a bigger or a smaller number if you like, but by doing so, you will also have to adjust what number range would give a 🌗 or 🌖 emoji
-
-**Stages 5 and 6** defines the conditions for when a half-moon 🌗 or a waning gibbous moon 🌖 emoji, respectively, is returned.  Each of these two stages is a combination of stages 3 and 4. The only thing that makes them different (and slightly more complicated) is that you have to define a **lower and upper limit**.
-
-**For Stage 5.** You have to state that a half-moon only appears when the decimal number is **larger or equal to 40** (0.4) **but less than 70** (0.7). You can customize the lower and upper limit here, but make sure to adjust the limits in other places in the formula as well.
-
-    format((largerEq(equal(length(slice(format(prop("Number Rating")), 2)), 1) ? (toNumber(slice(format(prop("Number Rating")), 2)) * 10) : toNumber(slice(format(prop("Number Rating")), 2)), 40) and smaller(equal(length(slice(format(prop("Number Rating")), 2)), 1) ? (toNumber(slice(format(prop("Number Rating")), 2)) * 10) : toNumber(slice(format(prop("Number Rating")), 2)), 69)) ? "🌗" : "")
-
-**For Stage 6**. A waning gibbous moon emoji 🌖 is returned only when the decimal place is **larger or equal to 70** (0.7) and when it is **smaller or equal to 99**.
-
-    format((largerEq(equal(length(slice(format(prop("Number Rating")), 2)), 1) ? (toNumber(slice(format(prop("Number Rating")), 2)) * 10) : toNumber(slice(format(prop("Number Rating")), 2)), 70) and smallerEq(equal(length(slice(format(prop("Number Rating")), 2)), 1) ? (toNumber(slice(format(prop("Number Rating")), 2)) * 10) : toNumber(slice(format(prop("Number Rating")), 2)), 99)) ? "🌖" : "")
-
-**Stage 7.** Lastly, this part tells us how many new moon emojis 🌑 to return
-
-    slice("🌑🌑🌑🌑🌑", 2 * ceil(prop("Number Rating"))))
-
-
-## Snippets
-
-**Display Zeroes in Decimals**
-
-    equal(length(slice(format(prop("Number Rating")), 2)), 2) ? format(prop("Number Rating")) : equal(length(slice(format(prop("Number Rating")), 2)), 1) ? concat(format(prop("Number Rating")), format(0)) : equal(length(slice(format(prop("Number Rating")), 2)), 0) ? concat(format(prop("Number Rating")), ".", format(0), format(0)) : ""
+![[Pasted image 20240525155207.png|500]]
 
 ---
 
-**Airtable Version**
+## Assigning Values to the Emojis
 
-    IF(Rating=BLANK(),"N/A 🌑🌑🌑🌑🌑",CONCATENATE(Rating," ",REPT("🌕",FLOOR(Rating)),IF(AND((RIGHT(Rating,2)>0),(RIGHT(Rating,2)<=40)),"🌘",""),IF(AND((RIGHT(Rating,2)>40),(RIGHT(Rating,2)<70)),"🌗",""),IF(AND((RIGHT(Rating,2)>=70),(RIGHT(Rating,2)<=99)),"🌖",""),IF(RIGHT(Rating,2)>0,REPT("🌑",FLOOR(5-Rating)),REPT("🌑",5-Rating))))
+First, let’s establish the values associated with each moon phase emoji:
+
+- 🌑 = 0
+- 🌘 = for decimals less than 0.5
+- 🌗 = for a decimal value of exactly 0.5
+- 🌖 = for decimals greater than 0.5
+- 🌕 = 1
+
+Integers will be represented by full moons. For example, the whole number 3 will be depicted as three full moons (🌕🌕🌕) or as three full moons and two new moons (🌕🌕🌕🌑🌑).
+
+Adding new moons will show that the rating scale is up to 5. This approach also maintains a uniform number of emojis, making the moon ratings appear tidier.
+
+**More examples:**
+
+- 4.25 = 🌕🌕🌕🌕🌘
+- 2.75 = 🌕🌕🌖🌑🌑
+- 5.00 = 🌕🌕🌕🌕🌕
+
+---
+
+## Writing the Formula
+
+Writing the formula will be done in four stages: Full Moons, Half-Moons, New Moons, and Integration. Upon completing the first three stages, you’ll have three distinct formulas. Set aside each formula upon completion of its respective stage. Ultimately, in the final Integration stage, we’ll consolidate these formulas to derive our comprehensive moon ratings formula.
+
+Before we begin, please note the following: Avoid copying and pasting the formulas provided below directly into your database, as this method won’t function properly. Instead, type out the formula manually, ensuring that you input the property name (“Number Rating” in this case) within the formula. Notion lacks the capability to automatically link the property name in copied formulas with the corresponding property in your database, necessitating manual input for the formula to work.
+
+### Stage 1. Full Moons
+
+#### Step 1. Isolate the Integers
+
+To isolate the integer part of our number rating, we use the `floor` function. This function provides the largest whole number that’s equal to or less than the given decimal. For example, whether it’s 2.3 or 2.85, `floor` will always return 2. If the number is already a whole number, like 3, it will simply return 3.
+
+```
+floor(Number Rating)
+```
+
+#### Step 2. Convert Integers to Full Moons
+
+Now that we have our integers, let’s convert it to full moons using the `repeat` function.
+
+```
+repeat("🌕", floor(Number Rating))
+```
+
+The `repeat` function repeats the specified text a given number of times. In the first argument, we designate the full moon emoji `“🌕”` as the text to be repeated. In the second argument, we indicate how many times to repeat it using the integer expression `floor(Number Rating)` we obtained from the previous step.
+
+Test the formula in your database. If it works, you should now have something like this:
+
+![[Pasted image 20240525171443.png]]
+
+### Stage 2. Half-Moons
+
+#### Step 1. Isolate the Decimals
+
+We can isolate the decimal part of the rating by subtracting the integer `floor(Number Rating)` from the total number:
+
+```
+Number Rating - floor(Number Rating)
+```
+
+If the rating is 3.75, the expression above should return the decimal value of 0.75.
+
+#### Step 2. Let *x* Be the Decimal
+
+Each half-moon corresponds to a distinct decimal value range. Consequently, we must assess our decimal expression `Number Rating - floor(Number Rating)` against multiple conditions to determine the appropriate half-moon. Rather than repeatedly invoking `Number Rating - floor(Number Rating)`, we streamline the process by representing it with a variable.
+
+We establish variables using the `let` function:
+
+```
+let(x, Number Rating - floor(Number Rating))
+```
+
+#### Step 3. Convert Decimals to Half-Moons
+
+Now that we have our decimals as a variable, we can proceed to test it against different conditions. To write this, we’ll employ the `ifs` function, which is ideal for handling multiple conditions simultaneously. It will return the value that corresponds to the first true condition.
+
+**Important:**
+
+Write the `ifs` conditions inside the `let` function from the previous step. This is necessary for the variable `x` to work as intended.
+
+**First Condition:** If the decimal is greater than 0 and less than 0.5, return a 🌘
+
+```
+let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘",
+```
+
+The first condition `x > 0 and x < 0.5, "🌘"` ends with a comma. We do not close the `ifs` and `let` functions just yet because we still have to add the other conditions.
+
+**Second Condition:** If the decimal is equal to 0.5, return a 🌗
+
+Add the second condition `x == 0.5, "🌗"` right after the first, then end with another comma.
+
+```
+let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗",
+```
+
+**Third Condition:** If the decimal is greater than 0.5, return a 🌖
+
+Add the third condition `x > 0.5, "🌖"` right after the second, then end with another comma.
+
+```
+let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗", x > 0.5, "🌖",
+```
+
+**Fourth Condition:** If there is no decimal part (i.e., the rating is a whole number), do not add any half-moons.
+
+Add two straight double quotes `""` , then close the `ifs` and `let` functions with two parentheses `))`.
+
+```
+let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗", x > 0.5, "🌖", ""))
+```
+
+Test the formula in your database. If everything works correctly, you should have something like this:
+
+![[Pasted image 20240525181756.png]]
+
+### Stage 3. New Moons
+
+#### Step 1. Calculate the Number of New Moons
+
+The number of new moons needed in the moon rating is decided by the difference between the rounded-up number rating and the scale’s upper limit, which is 5.
+
+We can use the `ceil` function to obtain the rounded-up number, then subtract it from 5.
+
+```
+5 - ceil(Number Rating)
+```
+
+#### Step 2. Convert Number to New Moons
+
+We can use the `repeat` function again from Stage 1 Step 2, but this time with the expression we used in the previous step.
+
+```
+repeat("🌑", 5 - ceil(Number Rating))
+```
+
+If everything works well, you should now have something like this:
+
+![[Pasted image 20240525202042.png]]
+
+### Stage 4. Integration
+
+Now, let’s consolidate the three formulas from the previous stages.
+
+**Full Moons:**
+
+```
+repeat("🌕", floor(Number Rating))
+```
+
+**Half-Moons:**
+
+```
+let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗", x > 0.5, "🌖", ""))
+```
+
+**New Moons:**
+
+```
+repeat("🌑", 5 - ceil(Number Rating))
+```
+
+Combining these three is straightforward. We simply add them together using `+`:
+
+```
+repeat("🌕", floor(Number Rating)) + let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗", x > 0.5, "🌖", "")) + repeat("🌑", 5 - ceil(Number Rating))
+```
+
+And we are done!
+
+![[Pasted image 20240525203042.png]]
