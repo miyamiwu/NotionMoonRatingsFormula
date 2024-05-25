@@ -1,0 +1,1 @@
+repeat("🌕", floor(Number Rating)) + let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x == 0.5, "🌗", x > 0.5, "🌖", "")) + repeat("🌑", 5 - ceil(Number Rating))
