@@ -1,8 +1,8 @@
 # Notion Formula Tutorial: Convert Numbers with Decimals into Moon Phase Emojis
 
-There are many Notion formula tutorials that convert number ratings into cute emojis, but none seem to address ratings with decimals like 3.5, 2.2, or 4.75. To fill this gap, I wrote my own formula. This will be particularly useful for nuanced book and movie ratings.
+There are many Notion formulas that convert number ratings into cute emojis like stars ⭐ and hearts 🩷, but these formulas often don’t account for decimal numbers. What if you want to rate a book with 3.6 or a movie with 4.25?
 
-We will use a rating scale of 1-5, represented with different moon phase emojis: 🌑🌘🌗🌖🌕.
+To address this gap, I created a formula that uses a 0-5 rating scale represented by different moon phase emojis: 🌑🌘🌗🌖🌕. While some basic knowledge of Notion formulas is recommended for this tutorial, I have aimed to explain everything as clearly as possible to ensure you can follow along with ease.
 
 ---
 
@@ -18,7 +18,9 @@ Within your database, create a number property named “Number Rating.” This p
 
 The name of this property is flexible. In my setup, I call it “Moon Ratings.” This is where we will write our formula.
 
-![[Pasted image 20240525155207.png|500]]
+Here’s what our database should look like now:
+
+<img src= "https://github.com/miyamiwu/NotionMoonRatingsFormula/blob/main/img_preview/Database%20Preview.png" width="500px">
 
 ---
 
@@ -46,9 +48,9 @@ Adding new moons will show that the rating scale is up to 5. This approach also 
 
 ## Writing the Formula
 
-Writing the formula will be done in four stages: Full Moons, Half-Moons, New Moons, and Integration. Upon completing the first three stages, you’ll have three distinct formulas. Set aside each formula upon completion of its respective stage. Ultimately, in the final Integration stage, we’ll consolidate these formulas to derive our comprehensive moon ratings formula.
+Writing the formula will be done in four stages: **Full Moons, Waning Moons, New Moons, and Integration**. Upon completing the first three stages, you’ll have three distinct formulas. Set aside each formula upon completion of its respective stage. Ultimately, in the final Integration stage, we’ll consolidate these formulas to derive our comprehensive moon ratings formula.
 
-Before we begin, please note the following: Avoid copying and pasting the formulas provided below directly into your database, as this method won’t function properly. Instead, type out the formula manually, ensuring that you input the property name (“Number Rating” in this case) within the formula. Notion lacks the capability to automatically link the property name in copied formulas with the corresponding property in your database, necessitating manual input for the formula to work.
+Before we begin, please note the following: Avoid copying and pasting the formulas provided below directly into your database, as this method may not function properly. Instead, type out the formula manually, ensuring that you input the property name (“Number Rating” in this case) within the formula. Sometimes, Notion doesn't automatically link the property name in copied formulas with the corresponding property in your database, so you have to manually input them.
 
 ### Stage 1. Full Moons
 
@@ -72,9 +74,10 @@ The `repeat` function repeats the specified text a given number of times. In the
 
 Test the formula in your database. If it works, you should now have something like this:
 
-![[Pasted image 20240525171443.png]]
+<img src="https://github.com/miyamiwu/NotionMoonRatingsFormula/blob/main/img_preview/Database%20with%20Full%20Moons.png" width="500px">
 
-### Stage 2. Half-Moons
+
+### Stage 2. Waning Moons
 
 #### Step 1. Isolate the Decimals
 
@@ -88,15 +91,15 @@ If the rating is 3.75, the expression above should return the decimal value of 0
 
 #### Step 2. Let *x* Be the Decimal
 
-Each half-moon corresponds to a distinct decimal value range. Consequently, we must assess our decimal expression `Number Rating - floor(Number Rating)` against multiple conditions to determine the appropriate half-moon. Rather than repeatedly invoking `Number Rating - floor(Number Rating)`, we streamline the process by representing it with a variable.
+Each waning moon corresponds to a distinct decimal value range. Consequently, we must assess our decimal expression `Number Rating - floor(Number Rating)` against multiple conditions to determine the appropriate half-moon. Rather than repeatedly invoking `Number Rating - floor(Number Rating)`, we streamline the process by representing it with a variable.
 
-We establish variables using the `let` function:
+This can be done using the `let` function:
 
 ```
 let(x, Number Rating - floor(Number Rating))
 ```
 
-#### Step 3. Convert Decimals to Half-Moons
+#### Step 3. Convert Decimals to Waning Moons
 
 Now that we have our decimals as a variable, we can proceed to test it against different conditions. To write this, we’ll employ the `ifs` function, which is ideal for handling multiple conditions simultaneously. It will return the value that corresponds to the first true condition.
 
@@ -138,7 +141,7 @@ let(x, Number Rating - floor(Number Rating), ifs(x > 0 and x < 0.5, "🌘", x ==
 
 Test the formula in your database. If everything works correctly, you should have something like this:
 
-![[Pasted image 20240525181756.png]]
+<img src="https://github.com/miyamiwu/NotionMoonRatingsFormula/blob/main/img_preview/Database%20with%20Waning%20Moons.png" width="500px">
 
 ### Stage 3. New Moons
 
@@ -162,7 +165,7 @@ repeat("🌑", 5 - ceil(Number Rating))
 
 If everything works well, you should now have something like this:
 
-![[Pasted image 20240525202042.png]]
+<img src="https://github.com/miyamiwu/NotionMoonRatingsFormula/blob/main/img_preview/Database%20with%20New%20Moons.png" width="500px">
 
 ### Stage 4. Integration
 
@@ -194,4 +197,4 @@ repeat("🌕", floor(Number Rating)) + let(x, Number Rating - floor(Number Ratin
 
 And we are done!
 
-![[Pasted image 20240525203042.png]]
+<img src="https://github.com/miyamiwu/NotionMoonRatingsFormula/blob/main/img_preview/Final%20Database.png" width="500px">
